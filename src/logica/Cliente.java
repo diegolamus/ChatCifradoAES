@@ -2,8 +2,17 @@ package logica;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 public class Cliente {
+	   private ObjectOutputStream salida;
+	   private ObjectInputStream entrada;
+	   private String mensaje = "";
+	   private String servidorChat;
+	   private Socket cliente;
+	
 	
 	
 	public Cliente () {
