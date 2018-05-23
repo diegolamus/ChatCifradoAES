@@ -66,8 +66,12 @@ public class VentanaChat extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				
+				btnConectar.setEnabled(false);
+				puerto.setEnabled(false);
+				iniciarServidor.setEnabled(false);
+				cliente = new Cliente(direccionIP.getText(), getChat());
+				Thread hilo = new Thread(cliente);
+				hilo.start();
 			}
 		});
 		this.add(btnConectar);
@@ -90,6 +94,8 @@ public class VentanaChat extends JFrame {
 				puerto.setEnabled(false);
 				servidor = new Servidor(getChat());
 				Thread hilo = new Thread(servidor);
+				btnEnviar.setEnabled(true);
+				iniciarServidor.setEnabled(false);
 				hilo.start();
 			}
 		});
@@ -106,10 +112,17 @@ public class VentanaChat extends JFrame {
 		btnEnviar.addActionListener(new ActionListener() {		
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
+				if(servidor!=null){
+					servidor.enviarDatos(mensaje.getText());
+					mensaje.setText("");
+				}
+				else if (cliente!=null) {
+					cliente.enviarDatos(mensaje.getText());
+					mensaje.setText("");
+				}
 			}
 		});
+		btnEnviar.setEnabled(false);
 		this.add(btnEnviar);
 		this.pack();
 		
@@ -118,7 +131,6 @@ public class VentanaChat extends JFrame {
 		JScrollPane pane = new JScrollPane(textArea);
 		pane.setBounds(10,120,480,250);
 		this.add(pane);
-
 	}
 	
 	private VentanaChat getChat() {
