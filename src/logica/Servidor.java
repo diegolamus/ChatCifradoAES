@@ -50,7 +50,7 @@ public class Servidor implements Runnable {
 				mensaje = (String) entrada.readObject();
 				mostrarMensaje(mensaje + "\n");
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
-
+				excepcionClaseNoEncontrada.printStackTrace();
 			}
 		} while (!mensaje.equals("CLIENTE ->" + TERMINAR));
 	}

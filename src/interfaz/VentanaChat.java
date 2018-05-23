@@ -66,8 +66,12 @@ public class VentanaChat extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO
-				
+				btnConectar.setEnabled(false);
+				puerto.setEnabled(false);
+				iniciarServidor.setEnabled(false);
+				cliente = new Cliente(direccionIP.getText(), getChat());
+				Thread hilo = new Thread(cliente);
+				hilo.start();
 			}
 		});
 		this.add(btnConectar);

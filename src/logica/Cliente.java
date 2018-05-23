@@ -8,98 +8,81 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class Cliente {
+import interfaz.VentanaChat;
+
+public class Cliente implements Runnable {
 
 	private ObjectOutputStream salida;
 	private ObjectInputStream entrada;
-	private String mensaje = "";
-	private String servidorChat;
+	private String IPservidor;
 	private Socket cliente;
+	private VentanaChat chat;
 
-	public Cliente(String direccionIp) {
-		servidorChat = direccionIp;
-		try {
-			conectarAServidor(); // Paso 1: crear un socket para realizar la conexi贸n
-			obtenerFlujos(); // Paso 2: obtener los flujos de entrada y salida
-			procesarConexion(); // Paso 3: procesar la conexi贸n
-		}
-		// el servidor cerr贸 la conexi贸n
-		catch (EOFException excepcionEOF) {
-			System.err.println("El cliente termino la conexi贸n");
-		}
-		// procesar los problemas que pueden ocurrir al comunicarse con el servidor
-		catch (IOException excepcionES) {
-			excepcionES.printStackTrace();
-		}
-
-		
-		finally {
-			cerrarConexion(); // Paso 4: cerrar la conexi贸n
-		}
+	public Cliente(String direccionIp, VentanaChat chat) {
+		IPservidor = direccionIp;
 	}
-	
-	
-	public String getMensaje() {
-		return mensaje;
-	}
-
-	public void setMensaje(String mensaje) {
-		this.mensaje = mensaje;
-	}
-
-
-
 
 	public void conectarAServidor() throws UnknownHostException, IOException {
-		cliente = new Socket(InetAddress.getByName(servidorChat), Servidor.port);
+		mostrarMensaje("Intentando realizar conexi髇\n");
+		cliente = new Socket(InetAddress.getByName(IPservidor), Servidor.port);
 	}
 
-
 	public void obtenerFlujos() throws IOException {
-		// lleno la salida
 		salida = new ObjectOutputStream(cliente.getOutputStream());
 		salida.flush();
-		// lleno la entrada
 		entrada = new ObjectInputStream(cliente.getInputStream());
-
 	}
 
 	public void procesarConexion() throws IOException {
-		do { 
-	         try {
-	            mensaje = ( String ) entrada.readObject();
-	            
-	         }
-	         catch ( ClassNotFoundException excepcionClaseNoEncontrada ) {
-	            
-	         }
-
-	      } while ( !mensaje.equals( "SERVIDOR>>> exit" ) );
-
-
+		String mensaje="";
+		do {
+			try {
+				mensaje = (String) entrada.readObject();
+				mostrarMensaje(mensaje + "\n");
+			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
+				excepcionClaseNoEncontrada.printStackTrace();
+			}
+		} while (!mensaje.equals("SERVIDOR -> " + Servidor.TERMINAR));
 	}
 
-	
-	public void cerrarConexion() { 
-	      try {
-	         salida.close();
-	         entrada.close();
-	         cliente.close();
-	      }
-	      catch( IOException excepcionES ) {
-	         excepcionES.printStackTrace();
-	      }
+	public void cerrarConexion() {
+		try {
+			salida.close();
+			entrada.close();
+			cliente.close();
+		} catch (IOException excepcionES) {
+			excepcionES.printStackTrace();
+		}
 	}
-	
-	
 
 	public void enviarDatos(String mensaje) {
 		try {
-			salida.writeObject("CLIENTE>>> " + mensaje);
+			salida.writeObject("CLIENTE ->  " + mensaje);
 			salida.flush();
+			mostrarMensaje("CLIENTE ->  " + mensaje+ "\n");
 		} catch (IOException excepcionES) {
 			excepcionES.printStackTrace();
+		}
+	}
 
+	public void mostrarMensaje(String mensaje) {
+		chat.mostrarMensaje(mensaje);
+	}
+
+	@Override
+	public void run() {
+		try {
+			conectarAServidor();
+			System.out.println("paso");
+			obtenerFlujos();
+			procesarConexion();
+		}
+		catch (EOFException excepcionEOF) {
+			mostrarMensaje("El servidor termino la conexion\n\n" );
+		} catch (IOException excepcionES) {
+			excepcionES.printStackTrace();
+		} finally {
+			cerrarConexion();
 		}
 	}
 
