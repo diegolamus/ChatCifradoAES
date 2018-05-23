@@ -41,7 +41,7 @@ public class VentanaChat extends JFrame {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLayout(null);
 		this.setResizable(false);
-		this.setPreferredSize(new Dimension(500, 500));
+		this.setPreferredSize(new Dimension(500, 430));
 
 		// Agregar campo para direccion IP
 		JLabel dirIP = new JLabel("Direccion IP destino:");
@@ -142,6 +142,7 @@ public class VentanaChat extends JFrame {
 		puerto.setEnabled(true);
 		btnEnviar.setEnabled(false);
 		iniciarServidor.setEnabled(true);
+		btnConectar.setEnabled(true);
 		servidor=null;
 		cliente=null;
 	}

@@ -13,7 +13,7 @@ public class Servidor implements Runnable {
 
 	public static final int port = 1234;
 	public static final int backlog = 100;
-	public static final String TERMINAR = "Terminar";
+	public static final String TERMINAR = "terminar";
 
 	private ObjectOutputStream salida;
 	private ObjectInputStream entrada;
@@ -52,7 +52,7 @@ public class Servidor implements Runnable {
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
 			}
-		} while (!mensaje.equals("CLIENTE ->" + TERMINAR));
+		} while (!mensaje.equalsIgnoreCase("CLIENTE ->" + TERMINAR));
 	}
 
 	private void cerrarConexion() {

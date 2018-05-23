@@ -42,7 +42,7 @@ public class Cliente implements Runnable {
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
 			}
-		} while (!mensaje.equals("SERVIDOR -> " + Servidor.TERMINAR));
+		} while (!mensaje.equalsIgnoreCase("SERVIDOR -> " + Servidor.TERMINAR));
 	}
 
 	public void cerrarConexion() {
@@ -75,6 +75,8 @@ public class Cliente implements Runnable {
 			conectarAServidor();
 			obtenerFlujos();
 			procesarConexion();
+			mostrarMensaje("------Conexion terminada-----");
+			chat.resetear();
 		}catch(UnknownHostException e) {
 			mostrarMensaje("No se encontro el host\n\n" );
 		}catch (EOFException excepcionEOF) {
