@@ -32,7 +32,7 @@ public class Servidor implements Runnable {
 	}
 
 	private void esperarConexion() throws IOException {
-		mostrarMensaje("Esperando al clinte");
+		mostrarMensaje("Esperando al clinte\n");
 		conexion = servidor.accept();
 	}
 
@@ -43,12 +43,12 @@ public class Servidor implements Runnable {
 	}
 
 	private void procesarConexion() throws IOException {
-		String mensaje = "Conexion exitosa con:" + conexion.getInetAddress().getHostName();
+		String mensaje = "Conexion exitosa con:" + conexion.getInetAddress().getHostName()+ "\n";
 		enviarDatos(mensaje);
 		do {
 			try {
 				mensaje = (String) entrada.readObject();
-				mostrarMensaje("\n" + mensaje);
+				mostrarMensaje(mensaje + "\n");
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 
 			}
@@ -65,12 +65,13 @@ public class Servidor implements Runnable {
 		}
 	}
 
-	private void enviarDatos(String mensaje) {
+	public void enviarDatos(String mensaje) {
 		try {
-			salida.writeObject("SERVIDOR --> " + mensaje);
+			salida.writeObject("SERVIDOR -> " + mensaje);
 			salida.flush();
-		} catch (IOException excepcionES) {
-			excepcionES.printStackTrace();
+			mostrarMensaje("SERVIDOR -> " + mensaje+ "\n");
+		} catch (Exception e) {
+			mostrarMensaje("Error al enviar mensaje, verifique que el cliente se encuentre conectado.\n");
 		}
 	}
 
@@ -87,7 +88,7 @@ public class Servidor implements Runnable {
 					obtenerFlujos();
 					procesarConexion();
 				} catch (EOFException excepcionEOF) {
-					mostrarMensaje("El cliente termino la conexion");
+					mostrarMensaje("El cliente termino la conexion\n\n");
 				} finally {
 					cerrarConexion();
 				}
