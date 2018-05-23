@@ -25,6 +25,7 @@ public class DiffieHellman {
     private String     secretMessage;
 
 
+    
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
     public void encryptAndSendMessage(final String message, final DiffieHellman person) {
