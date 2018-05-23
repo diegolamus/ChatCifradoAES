@@ -36,8 +36,6 @@ public class Cliente {
 			cerrarConexion(); // Paso 4: cerrar la conexión
 		}
 	}
-
-	
 	
 	
 	public String getMensaje() {
