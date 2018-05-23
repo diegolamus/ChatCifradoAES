@@ -9,9 +9,16 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import logica.Cliente;
+import logica.Servidor;
+
 public class VentanaChat extends JFrame {
 
 	private static final long serialVersionUID = -5070643191804052892L;
+	
+	// Cliente y servidor
+	private Cliente cliente;
+	private Servidor servidor;
 	
 	// Conexion
 	private JTextField direccionIP;
