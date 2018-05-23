@@ -5,39 +5,37 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class EncriptadorAES {
 
+	private static final String ALGORITMODECIFRADO = "AES";
 	
-	public static String encriptarMensaje(byte[] claveSecreta, String mensaje) {
-		try {
-			SecretKeySpec keySpec = new SecretKeySpec(claveSecreta, "AES");
-			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5");
-			cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-			byte[] mensajeEncriptado = cipher.doFinal(mensaje.getBytes());
-			return new String(mensajeEncriptado);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+		/**
+	     * Encripta el texto escrito
+	     *
+	     * @param textoPlano El texto a encriptar
+	     * @return mensaje encriptado
+	     */
+	    public byte[] encriptar(byte[] textoPlano, byte[] llaveSecreta)  throws Exception
+	    {
+	    	llaveSecreta = new byte [16];
+	        SecretKeySpec SsecretKey = new SecretKeySpec(llaveSecreta, ALGORITMODECIFRADO);
+	        System.out.println(llaveSecreta.length);
+	        Cipher cipher = Cipher.getInstance(ALGORITMODECIFRADO);
+	        cipher.init(Cipher.ENCRYPT_MODE, SsecretKey);
 
-	public static String desencriptarMensaje(byte[] claveSecreta, String mensaje) {
-		try {
-			SecretKeySpec keySpec = new SecretKeySpec(claveSecreta, "AES");
-			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5no");
-			cipher.init(Cipher.DECRYPT_MODE, keySpec);
-			String mensajeDesencriptado = new String(cipher.doFinal(mensaje.getBytes()));
-			return mensajeDesencriptado;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public static void main(String[] args) {
-		String hola = "hola";
-		byte[] clave= {3,10,8,25,26,2,3,4,5,6,7,12,34,12,3,4};
-		hola = encriptarMensaje(clave, hola);
-		System.out.println(hola);
-		hola = desencriptarMensaje(clave, hola);
-		System.out.println(hola);
-	}
+	        return cipher.doFinal(textoPlano);
+	    }
+	    
+	    /**
+	     * Desencripta el mensaje recibido.
+	     *
+	     * @param mensajeCifrado El mensaje que ha sido cifrado con anterioridad.
+	     * @return retorna el mensaje descifrado, es decir, el original en texto plano.
+	     */
+	    public byte[] desencriptar(byte[] mensajeCifrado, byte[] llaveSecreta) throws Exception
+	    {
+	        SecretKeySpec SsecretKey = new SecretKeySpec(llaveSecreta, ALGORITMODECIFRADO);
+	        Cipher cipher = Cipher.getInstance(ALGORITMODECIFRADO);
+	        cipher.init(Cipher.DECRYPT_MODE, SsecretKey);
+
+	        return cipher.doFinal(mensajeCifrado);
+	    }
 }
