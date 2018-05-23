@@ -37,6 +37,20 @@ public class Cliente {
 		}
 	}
 
+	
+	
+	
+	public String getMensaje() {
+		return mensaje;
+	}
+
+	public void setMensaje(String mensaje) {
+		this.mensaje = mensaje;
+	}
+
+
+
+
 	public void conectarAServidor() throws UnknownHostException, IOException {
 		cliente = new Socket(InetAddress.getByName(servidorChat), Servidor.port);
 	}
@@ -51,7 +65,18 @@ public class Cliente {
 
 	}
 
-	public void procesarConexion() {
+	public void procesarConexion() throws IOException {
+		do { 
+	         try {
+	            mensaje = ( String ) entrada.readObject();
+	            
+	         }
+	         catch ( ClassNotFoundException excepcionClaseNoEncontrada ) {
+	            
+	         }
+
+	      } while ( !mensaje.equals( "SERVIDOR>>> exit" ) );
+
 
 	}
 
@@ -74,6 +99,7 @@ public class Cliente {
 			salida.writeObject("CLIENTE>>> " + mensaje);
 			salida.flush();
 		} catch (IOException excepcionES) {
+			excepcionES.printStackTrace();
 
 		}
 	}
