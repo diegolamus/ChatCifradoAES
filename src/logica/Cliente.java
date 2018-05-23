@@ -4,7 +4,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class Cliente {
 	   private ObjectOutputStream salida;
@@ -15,7 +17,9 @@ public class Cliente {
 	
 	
 	
-	public Cliente () {
+	public Cliente (String direccionIp) {
+		servidorChat=direccionIp;
+		
 		 try {
 	         conectarAServidor(); // Paso 1: crear un socket para realizar la conexión
 	         obtenerFlujos();      // Paso 2: obtener los flujos de entrada y salida
@@ -36,8 +40,9 @@ public class Cliente {
 	}
 	
 	
-	public void conectarAServidor() {
-		
+	public void conectarAServidor() throws UnknownHostException, IOException {
+	      cliente = new Socket(InetAddress.getByName( servidorChat ), 12345/*"localhost", 80*/);      
+
 	}
 	
 	
