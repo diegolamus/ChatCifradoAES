@@ -24,12 +24,14 @@ public class DiffieHellman {
     private byte[]     secretKey;
     private String     secretMessage;
 
+    
 
     
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
     public void encryptAndSendMessage(final String message, final DiffieHellman person) {
 
+    	System.out.println(secretMessage);
         try {
 
             // You can use Blowfish or another symmetric algorithm but you must adjust the key size.
