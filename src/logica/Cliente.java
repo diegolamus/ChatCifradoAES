@@ -32,6 +32,7 @@ public class Cliente {
 			excepcionES.printStackTrace();
 		}
 
+		
 		finally {
 			cerrarConexion(); // Paso 4: cerrar la conexión
 		}
