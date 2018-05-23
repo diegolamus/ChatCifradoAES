@@ -46,7 +46,14 @@ public class Cliente {
 	}
 	
 	
-	public void obtenerFlujos() {
+	/**
+	 * obtiene los flujos traidos de la coneccion
+	 * @throws IOException
+	 */
+	public void obtenerFlujos() throws IOException {
+		salida = new ObjectOutputStream(cliente.getOutputStream());
+		salida.flush();
+		entrada = new ObjectInputStream(cliente.getInputStream());
 		
 	}
 	
