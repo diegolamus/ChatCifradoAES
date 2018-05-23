@@ -1,12 +1,15 @@
 package interfaz;
 
 import java.awt.Dimension;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import logica.Cliente;
@@ -24,8 +27,10 @@ public class VentanaChat extends JFrame {
 	private JTextField direccionIP;
 	private JTextField puerto;
 	private JButton btnConectar;
+	private JButton iniciarServidor;
 
 	// Mensajes
+	private JTextArea textArea;
 	private JTextField mensaje;
 	private JButton btnEnviar;
 
@@ -53,7 +58,7 @@ public class VentanaChat extends JFrame {
 
 		// agregar boton conectar
 		btnConectar = new JButton("Conectar");
-		btnConectar.setBounds(10, 70, 100, 25);
+		btnConectar.setBounds(10, 70, 150, 25);
 		btnConectar.addActionListener(new ActionListener() {
 			
 			@Override
@@ -63,17 +68,30 @@ public class VentanaChat extends JFrame {
 			}
 		});
 		this.add(btnConectar);
+		
+		// agregar boton conectar
+		iniciarServidor = new JButton("Iniciar Servidor");
+		iniciarServidor.setBounds(170, 70, 150, 25);
+		iniciarServidor.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnConectar.setEnabled(false);
+				servidor = new Servidor(getChat());
+				servidor.ejecutarServidor();
+			}
+		});
+		this.add(iniciarServidor);
 
 		// Agregar campo mensaje
 		mensaje = new JTextField();
-		mensaje.setBounds(10, 300, 300, 25);
+		mensaje.setBounds(10, 380, 360, 25);
 		this.add(mensaje);
 
 		// Agregar boton enviar
 		btnEnviar = new JButton("Enviar");
-		btnEnviar.setBounds(320, 300, 100, 25);
-		btnEnviar.addActionListener(new ActionListener() {
-			
+		btnEnviar.setBounds(390, 380, 100, 25);
+		btnEnviar.addActionListener(new ActionListener() {		
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
@@ -81,8 +99,22 @@ public class VentanaChat extends JFrame {
 			}
 		});
 		this.add(btnEnviar);
-	
 		this.pack();
+		
+		//Agregar text area
+		textArea = new JTextArea();
+		JScrollPane pane = new JScrollPane(textArea);
+		pane.setBounds(10,120,480,250);
+		this.add(pane);
+
+	}
+	
+	private VentanaChat getChat() {
+		return this;
+	}
+	
+	public void mostrarMensaje(String mensaje) {
+		
 	}
 
 	public static void main(String[] args) {
