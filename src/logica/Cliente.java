@@ -41,11 +41,7 @@ public class Cliente {
 		cliente = new Socket(InetAddress.getByName(servidorChat), Servidor.port);
 	}
 
-	/**
-	 * obtiene los flujos traidos de la coneccion
-	 * 
-	 * @throws IOException
-	 */
+
 	public void obtenerFlujos() throws IOException {
 		// lleno la salida
 		salida = new ObjectOutputStream(cliente.getOutputStream());
@@ -59,15 +55,19 @@ public class Cliente {
 
 	}
 
-	public void cerrarConexion() {
-		try {
-			salida.close();
-			entrada.close();
-			cliente.close();
-		} catch (IOException excepcionES) {
-			excepcionES.printStackTrace();
-		}
+	
+	public void cerrarConexion() { 
+	      try {
+	         salida.close();
+	         entrada.close();
+	         cliente.close();
+	      }
+	      catch( IOException excepcionES ) {
+	         excepcionES.printStackTrace();
+	      }
 	}
+	
+	
 
 	public void enviarDatos(String mensaje) {
 		try {
