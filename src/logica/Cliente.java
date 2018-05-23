@@ -54,8 +54,15 @@ public class Cliente {
 		
 	}
 	
-	public void cerrarConexion() {
-		
+	public void cerrarConexion() { 
+	      try {
+	         salida.close();
+	         entrada.close();
+	         cliente.close();
+	      }
+	      catch( IOException excepcionES ) {
+	         excepcionES.printStackTrace();
+	      }
 	}
 	
 
