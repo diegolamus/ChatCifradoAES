@@ -1,5 +1,8 @@
 package interfaz;
 
-public class ventanaChat {
+import java.awt.*;
 
+public class ventanaChat implements JFrame {
+
+	
 }
