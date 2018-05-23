@@ -36,6 +36,8 @@ public class VentanaChat extends JFrame {
 	private JButton btnEnviar;
 
 	public VentanaChat() {
+		cliente =null;
+		servidor=null;
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLayout(null);
 		this.setResizable(false);
@@ -124,7 +126,7 @@ public class VentanaChat extends JFrame {
 	}
 	
 	public void mostrarMensaje(String mensaje) {
-		
+		textArea.append(mensaje);
 	}
 
 	public static void main(String[] args) {
