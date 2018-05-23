@@ -4,7 +4,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -19,12 +18,13 @@ public class Cliente implements Runnable {
 	private VentanaChat chat;
 
 	public Cliente(String direccionIp, VentanaChat chat) {
+		this.chat=chat;
 		IPservidor = direccionIp;
 	}
 
 	public void conectarAServidor() throws UnknownHostException, IOException {
-		mostrarMensaje("Intentando realizar conexión\n");
-		cliente = new Socket(InetAddress.getByName(IPservidor), Servidor.port);
+		mostrarMensaje("Intentando realizar conexion\n");
+		cliente = new Socket(IPservidor, Servidor.port);
 	}
 
 	public void obtenerFlujos() throws IOException {
@@ -73,15 +73,18 @@ public class Cliente implements Runnable {
 	public void run() {
 		try {
 			conectarAServidor();
-			System.out.println("paso");
 			obtenerFlujos();
 			procesarConexion();
-		}
-		catch (EOFException excepcionEOF) {
+		}catch(UnknownHostException e) {
+			mostrarMensaje("No se encontro el host\n\n" );
+		}catch (EOFException excepcionEOF) {
 			mostrarMensaje("El servidor termino la conexion\n\n" );
-		} catch (IOException excepcionES) {
+		}catch (IOException excepcionES) {
 			excepcionES.printStackTrace();
-		} finally {
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		finally {
 			cerrarConexion();
 		}
 	}

@@ -69,8 +69,10 @@ public class VentanaChat extends JFrame {
 				btnConectar.setEnabled(false);
 				puerto.setEnabled(false);
 				iniciarServidor.setEnabled(false);
+				btnEnviar.setEnabled(true);
 				cliente = new Cliente(direccionIP.getText(), getChat());
 				Thread hilo = new Thread(cliente);
+				direccionIP.setEnabled(false);
 				hilo.start();
 			}
 		});
@@ -131,6 +133,17 @@ public class VentanaChat extends JFrame {
 		JScrollPane pane = new JScrollPane(textArea);
 		pane.setBounds(10,120,480,250);
 		this.add(pane);
+	}
+	
+	public void resetear() {
+		direccionIP.setEnabled(true);
+		direccionIP.setText("");
+		puerto.setText("");
+		puerto.setEnabled(true);
+		btnEnviar.setEnabled(false);
+		iniciarServidor.setEnabled(true);
+		servidor=null;
+		cliente=null;
 	}
 	
 	private VentanaChat getChat() {
