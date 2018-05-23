@@ -11,8 +11,8 @@ import interfaz.VentanaChat;
 
 public class Servidor {
 
-	private static final int port = 1234;
-	private static final int backlog = 100;
+	public static final int port = 1234;
+	public static final int backlog = 100;
 
 	private ObjectOutputStream salida;
 	private ObjectInputStream entrada;
@@ -98,7 +98,7 @@ public class Servidor {
 	}
 	
 	public void mostrarMensaje(String mensaje) {
-		//TODO
+		chat.mostrarMensaje(mensaje);
 	}
 
 }

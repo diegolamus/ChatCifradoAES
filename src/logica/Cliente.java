@@ -9,80 +9,73 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class Cliente {
-	   private ObjectOutputStream salida;
-	   private ObjectInputStream entrada;
-	   private String mensaje = "";
-	   private String servidorChat;
-	   private Socket cliente;
-	
-	
-	
-	public Cliente (String direccionIp) {
-		servidorChat=direccionIp;
-		
-		 try {
-	         conectarAServidor(); // Paso 1: crear un socket para realizar la conexión
-	         obtenerFlujos();      // Paso 2: obtener los flujos de entrada y salida
-	         procesarConexion(); // Paso 3: procesar la conexión
-	      }
-	      // el servidor cerró la conexión
-	      catch ( EOFException excepcionEOF ) {
-	         System.err.println( "El cliente termino la conexión" );
-	      }
-	      // procesar los problemas que pueden ocurrir al comunicarse con el servidor
-	      catch ( IOException excepcionES ) {
-	         excepcionES.printStackTrace();
-	      }
 
-	      finally {
-	         cerrarConexion(); // Paso 4: cerrar la conexión
-	      }
+	private ObjectOutputStream salida;
+	private ObjectInputStream entrada;
+	private String mensaje = "";
+	private String servidorChat;
+	private Socket cliente;
+
+	public Cliente(String direccionIp) {
+		servidorChat = direccionIp;
+		try {
+			conectarAServidor(); // Paso 1: crear un socket para realizar la conexión
+			obtenerFlujos(); // Paso 2: obtener los flujos de entrada y salida
+			procesarConexion(); // Paso 3: procesar la conexión
+		}
+		// el servidor cerró la conexión
+		catch (EOFException excepcionEOF) {
+			System.err.println("El cliente termino la conexión");
+		}
+		// procesar los problemas que pueden ocurrir al comunicarse con el servidor
+		catch (IOException excepcionES) {
+			excepcionES.printStackTrace();
+		}
+
+		finally {
+			cerrarConexion(); // Paso 4: cerrar la conexión
+		}
 	}
-	
-	
+
 	public void conectarAServidor() throws UnknownHostException, IOException {
-	      cliente = new Socket(InetAddress.getByName( servidorChat ), 12345/*"localhost", 80*/);      
-
+		cliente = new Socket(InetAddress.getByName(servidorChat), Servidor.port);
 	}
-	
-	
+
 	/**
 	 * obtiene los flujos traidos de la coneccion
+	 * 
 	 * @throws IOException
 	 */
 	public void obtenerFlujos() throws IOException {
-		//lleno la salida
+		// lleno la salida
 		salida = new ObjectOutputStream(cliente.getOutputStream());
 		salida.flush();
-		//lleno la entrada
+		// lleno la entrada
 		entrada = new ObjectInputStream(cliente.getInputStream());
-		
+
 	}
-	
+
 	public void procesarConexion() {
-		
+
 	}
-	
-	public void cerrarConexion() { 
-	      try {
-	         salida.close();
-	         entrada.close();
-	         cliente.close();
-	      }
-	      catch( IOException excepcionES ) {
-	         excepcionES.printStackTrace();
-	      }
-	}
-	
-	public void enviarDatos (String mensaje) {
+
+	public void cerrarConexion() {
 		try {
-	         salida.writeObject( "CLIENTE>>> " + mensaje );
-	         salida.flush();
-	         
-	      }
-	      catch ( IOException excepcionES ) {
-	         
-	      }
+			salida.close();
+			entrada.close();
+			cliente.close();
+		} catch (IOException excepcionES) {
+			excepcionES.printStackTrace();
+		}
+	}
+
+	public void enviarDatos(String mensaje) {
+		try {
+			salida.writeObject("CLIENTE>>> " + mensaje);
+			salida.flush();
+		} catch (IOException excepcionES) {
+
+		}
 	}
 
 }
