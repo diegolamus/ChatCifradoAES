@@ -15,58 +15,31 @@ import java.security.PublicKey;
 public class DiffieHellman {
 
 
-    private PrivateKey privateKey;
-    private PublicKey  publicKey;
-    private PublicKey  receivedPublicKey;
-    private byte[]     secretKey;
-    private String     secretMessage;
-
+    private PrivateKey llavePrivada;
+    private PublicKey  llavePublica;
+    private PublicKey  llavePublicaRecibida;
+    private byte[]     llaveSecreta;
+    private String     mensajeSecreto;
     
 
+    private static final String ALGORITMODECIFRADO = "AES";
+
     
-    //~ --- [METHODS] --------------------------------------------------------------------------------------------------
+    public void generarClaveSecreta() {
 
-    public void encryptAndSendMessage(final String message) {
-
-    	System.out.println(secretMessage);
         try {
+            KeyAgreement keyAgreement = KeyAgreement.getInstance("DH");
+            keyAgreement.init(llavePrivada);
+            keyAgreement.doPhase(llavePublicaRecibida, true);
 
-            // You can use Blowfish or another symmetric algorithm but you must adjust the key size.
-            final SecretKeySpec keySpec = new SecretKeySpec(secretKey, "AES");
-            final Cipher        cipher  = Cipher.getInstance("AES/CBC/NOPADDING");
-
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-
-            final byte[] encryptedMessage = cipher.doFinal(message.getBytes());
-
-            receiveAndDecryptMessage(encryptedMessage);
+            llaveSecreta = keyAgreement.generateSecret();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    public void generateCommonSecretKey() {
-
-        try {
-            final KeyAgreement keyAgreement = KeyAgreement.getInstance("DH");
-            keyAgreement.init(privateKey);
-            keyAgreement.doPhase(receivedPublicKey, true);
-
-            secretKey = shortenSecretKey(keyAgreement.generateSecret());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    public void generateKeys() {
+    public void generarKeys() {
 
         try {
             final KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("DH");
@@ -74,55 +47,29 @@ public class DiffieHellman {
 
             final KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
-            privateKey = keyPair.getPrivate();
-            publicKey  = keyPair.getPublic();
+            llavePrivada = keyPair.getPrivate();
+            llavePublica  = keyPair.getPublic();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
+    public PublicKey getLlavePublica() {
 
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    public PublicKey getPublicKey() {
-
-        return publicKey;
+        return llavePublica;
     }
 
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    public void receiveAndDecryptMessage(final byte[] message) {
-
-        try {
-
-            // You can use Blowfish or another symmetric algorithm but you must adjust the key size.
-            final SecretKeySpec keySpec = new SecretKeySpec(secretKey, "AES");
-            final Cipher        cipher  = Cipher.getInstance("AES/CBC/NOPADDING");
-
-            cipher.init(Cipher.DECRYPT_MODE, keySpec);
-
-            secretMessage = new String(cipher.doFinal(message));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
     /**
      * In a real life example you must serialize the public key for transferring.
      *
      * @param  person
      */
-    public void receivePublicKeyFrom(final DiffieHellman person) {
+    public void recibirLlavePublicaDe( DiffieHellman llave) {
 
-        receivedPublicKey = person.getPublicKey();
+        llavePublicaRecibida = llave.getLlavePublica();
     }
 
 
@@ -137,47 +84,58 @@ public class DiffieHellman {
      *
      * @return
      */
-    private byte[] shortenSecretKey(final byte[] longKey) {
 
-    	final byte[] shortenedKey = new byte[8];
-        try {
-        	
-       
-            // Use 8 bytes (64 bits) for DES, 6 bytes (48 bits) for Blowfish
-            
-
-            
-            System.arraycopy(longKey, 0, shortenedKey, 0, shortenedKey.length);
-
-            return shortenedKey;
-            
-
-            // Below lines can be more secure
-            // final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-            // final DESKeySpec       desSpec    = new DESKeySpec(longKey);
-            //
-            // return keyFactory.generateSecret(desSpec).getEncoded();
-        } catch (Exception e) {
-            e.printStackTrace();
-            
-        }
-
-        return shortenedKey;
-    }
     
     
     public static void main(String[] args) {
 		DiffieHellman a = new DiffieHellman();
 		
-		a.generateKeys();
-		a.generateCommonSecretKey();
-		a.encryptAndSendMessage("Holaaaaa");
-		System.out.println(a.secretMessage);
+		a.generarKeys();
+		a.recibirLlavePublicaDe(a);
+		a.generarClaveSecreta();
+		try {
+			byte[] msgEn=a.encriptar("Eileen".getBytes());
+			System.out.println(new String(msgEn));
+			byte[] msgDes=a.desencriptar((msgEn));
+			a.mensajeSecreto=new String(msgDes);
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		System.out.println(a.mensajeSecreto);
 		
 		
 	}
+    /**
+     * Encripta el texto escrito
+     *
+     * @param textoPlano El texto a encriptar
+     * @return mensaje encriptado
+     */
+    public byte[] encriptar(byte[] textoPlano) throws Exception
+    {
+    	llaveSecreta = new byte [16];
+        SecretKeySpec SsecretKey = new SecretKeySpec(llaveSecreta, ALGORITMODECIFRADO);
+        System.out.println(llaveSecreta.length);
+        Cipher cipher = Cipher.getInstance(ALGORITMODECIFRADO);
+        cipher.init(Cipher.ENCRYPT_MODE, SsecretKey);
+
+        return cipher.doFinal(textoPlano);
+    }
     
-    
+    /**
+     * Des
+     *
+     * @param cipherText The data to decrypt
+     */
+    public byte[] desencriptar(byte[] cipherText) throws Exception
+    {
+        SecretKeySpec SsecretKey = new SecretKeySpec(llaveSecreta, ALGORITMODECIFRADO);
+        Cipher cipher = Cipher.getInstance(ALGORITMODECIFRADO);
+        cipher.init(Cipher.DECRYPT_MODE, SsecretKey);
+
+        return cipher.doFinal(cipherText);
+    }
     
     
     }
