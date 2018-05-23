@@ -78,7 +78,7 @@ public class VentanaChat extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				btnConectar.setEnabled(false);
 				servidor = new Servidor(getChat());
-				servidor.ejecutarServidor();
+				//servidor.ejecutarServidor();
 			}
 		});
 		this.add(iniciarServidor);
