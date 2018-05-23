@@ -32,6 +32,7 @@ public class Servidor implements Runnable {
 	}
 
 	private void esperarConexion() throws IOException {
+		mostrarMensaje("Esperando al clinte");
 		conexion = servidor.accept();
 	}
 
@@ -42,7 +43,7 @@ public class Servidor implements Runnable {
 	}
 
 	private void procesarConexion() throws IOException {
-		String mensaje = "Conexion exitosa";
+		String mensaje = "Conexion exitosa con:" + conexion.getInetAddress().getHostName();
 		enviarDatos(mensaje);
 		do {
 			try {
@@ -79,19 +80,22 @@ public class Servidor implements Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
-			try {
+		try {
+			while (true) {
 				try {
 					esperarConexion();
 					obtenerFlujos();
 					procesarConexion();
 				} catch (EOFException excepcionEOF) {
-					excepcionEOF.printStackTrace();
+					mostrarMensaje("El cliente termino la conexion");
+				} finally {
+					cerrarConexion();
 				}
-			} catch (IOException excepcionES) {
-				excepcionES.printStackTrace();
 			}
+		} catch (IOException excepcionES) {
+			excepcionES.printStackTrace();
 		}
+
 	}
 
 }

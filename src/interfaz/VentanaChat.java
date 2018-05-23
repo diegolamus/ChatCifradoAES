@@ -3,6 +3,8 @@ package interfaz;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -76,6 +78,11 @@ public class VentanaChat extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				btnConectar.setEnabled(false);
+				try {
+					direccionIP.setText((InetAddress.getLocalHost()+"").split("/")[1]);
+				} catch (UnknownHostException e1) {
+					e1.printStackTrace();
+				}
 				direccionIP.setEnabled(false);
 				puerto.setText(Servidor.port+"");
 				puerto.setEnabled(false);
