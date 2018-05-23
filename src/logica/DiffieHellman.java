@@ -9,14 +9,11 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-
+ 
 
 
 public class DiffieHellman {
 
-
-
-    //~ --- [INSTANCE FIELDS] ------------------------------------------------------------------------------------------
 
     private PrivateKey privateKey;
     private PublicKey  publicKey;
@@ -29,7 +26,7 @@ public class DiffieHellman {
     
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
-    public void encryptAndSendMessage(final String message, final DiffieHellman person) {
+    public void encryptAndSendMessage(final String message) {
 
     	System.out.println(secretMessage);
         try {
@@ -42,7 +39,7 @@ public class DiffieHellman {
 
             final byte[] encryptedMessage = cipher.doFinal(message.getBytes());
 
-            person.receiveAndDecryptMessage(encryptedMessage);
+            receiveAndDecryptMessage(encryptedMessage);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -113,6 +110,7 @@ public class DiffieHellman {
         }
     }
 
+    
 
 
     //~ ----------------------------------------------------------------------------------------------------------------
@@ -131,15 +129,6 @@ public class DiffieHellman {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public void whisperTheSecretMessage() {
-
-        System.out.println(secretMessage);
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
     /**
      * 1024 bit symmetric key size is so big for DES so we must shorten the key size. You can get first 8 longKey of the
      * byte array or can use a key factory
@@ -150,11 +139,12 @@ public class DiffieHellman {
      */
     private byte[] shortenSecretKey(final byte[] longKey) {
 
+    	final byte[] shortenedKey = new byte[8];
         try {
         	
        
             // Use 8 bytes (64 bits) for DES, 6 bytes (48 bits) for Blowfish
-            final byte[] shortenedKey = new byte[8];
+            
 
             
             System.arraycopy(longKey, 0, shortenedKey, 0, shortenedKey.length);
@@ -172,6 +162,22 @@ public class DiffieHellman {
             
         }
 
-        return null;
+        return shortenedKey;
     }
+    
+    
+    public static void main(String[] args) {
+		DiffieHellman a = new DiffieHellman();
+		
+		a.generateKeys();
+		a.generateCommonSecretKey();
+		a.encryptAndSendMessage("Holaaaaa");
+		System.out.println(a.secretMessage);
+		
+		
+	}
+    
+    
+    
+    
     }
