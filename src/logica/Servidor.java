@@ -6,11 +6,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
+import javax.crypto.SecretKey;
 
 import interfaz.VentanaChat;
 
 public class Servidor implements Runnable {
 
+	public static final String PUBLIC_KEY_LABEL = "PUBLIC_KEY_SHARE: ";
 	public static final int port = 1234;
 	public static final int backlog = 100;
 	public static final String TERMINAR = "terminar";
@@ -21,6 +26,10 @@ public class Servidor implements Runnable {
 	private Socket conexion;
 
 	private VentanaChat chat;
+
+	private PrivateKey privateKey;
+	private PublicKey publicKey;
+	private byte[] secret;
 
 	public Servidor(VentanaChat chat) {
 		this.chat = chat;
@@ -43,12 +52,16 @@ public class Servidor implements Runnable {
 	}
 
 	private void procesarConexion() throws IOException {
-		String mensaje = "Conexion exitosa con:" + conexion.getInetAddress().getHostName()+ "\n";
+		String mensaje = "Conexion exitosa con:" + conexion.getInetAddress().getHostName() + "\n";
 		enviarDatos(mensaje);
+		enviarDatos(PUBLIC_KEY_LABEL + publicKey);
 		do {
 			try {
 				mensaje = (String) entrada.readObject();
-				mostrarMensaje(mensaje + "\n");
+				if (mensaje.contains(PUBLIC_KEY_LABEL)) {
+					//TODO
+				} else
+					mostrarMensaje(mensaje + "\n");
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
 			}
@@ -69,7 +82,7 @@ public class Servidor implements Runnable {
 		try {
 			salida.writeObject("SERVIDOR -> " + mensaje);
 			salida.flush();
-			mostrarMensaje("SERVIDOR -> " + mensaje+ "\n");
+			mostrarMensaje("SERVIDOR -> " + mensaje + "\n");
 		} catch (Exception e) {
 			mostrarMensaje("Error al enviar mensaje, verifique que el cliente se encuentre conectado.\n");
 		}

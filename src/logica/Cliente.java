@@ -6,6 +6,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import interfaz.VentanaChat;
 
@@ -16,6 +18,10 @@ public class Cliente implements Runnable {
 	private String IPservidor;
 	private Socket cliente;
 	private VentanaChat chat;
+	
+	private PrivateKey privateKey;
+	private PublicKey publicKey;
+	private byte[] secret;
 
 	public Cliente(String direccionIp, VentanaChat chat) {
 		this.chat=chat;
@@ -33,12 +39,16 @@ public class Cliente implements Runnable {
 		entrada = new ObjectInputStream(cliente.getInputStream());
 	}
 
-	public void procesarConexion() throws IOException {
+	public void procesarConexion() throws IOException {	
 		String mensaje="";
 		do {
 			try {
 				mensaje = (String) entrada.readObject();
 				mostrarMensaje(mensaje + "\n");
+				if(mensaje.contains(Servidor.PUBLIC_KEY_LABEL)) {
+					enviarDatos(Servidor.PUBLIC_KEY_LABEL+ publicKey.toString());
+					//TODO
+				}
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
 			}
