@@ -13,6 +13,7 @@ public class Servidor implements Runnable {
 
 	public static final int port = 1234;
 	public static final int backlog = 100;
+	public static final String TERMINAR = "Terminar";
 
 	private ObjectOutputStream salida;
 	private ObjectInputStream entrada;
@@ -22,13 +23,14 @@ public class Servidor implements Runnable {
 	private VentanaChat chat;
 
 	public Servidor(VentanaChat chat) {
+		this.chat = chat;
 		try {
 			servidor = new ServerSocket(port, backlog);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void esperarConexion() throws IOException {
 		conexion = servidor.accept();
 	}
@@ -40,9 +42,8 @@ public class Servidor implements Runnable {
 	}
 
 	private void procesarConexion() throws IOException {
-		String mensaje = "Conexión exitosa";
+		String mensaje = "Conexion exitosa";
 		enviarDatos(mensaje);
-		// establecerCampoTextoEditable( true );
 		do {
 			try {
 				mensaje = (String) entrada.readObject();
@@ -50,7 +51,7 @@ public class Servidor implements Runnable {
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 
 			}
-		} while (!mensaje.equals("CLIENTE>>> TERMINAR"));
+		} while (!mensaje.equals("CLIENTE ->" + TERMINAR));
 	}
 
 	private void cerrarConexion() {
@@ -78,18 +79,18 @@ public class Servidor implements Runnable {
 
 	@Override
 	public void run() {
-		try {
+		while (true) {
 			try {
-
-				esperarConexion(); 
-				obtenerFlujos();
-				procesarConexion(); 
+				try {
+					esperarConexion();
+					obtenerFlujos();
+					procesarConexion();
+				} catch (EOFException excepcionEOF) {
+					excepcionEOF.printStackTrace();
+				}
+			} catch (IOException excepcionES) {
+				excepcionES.printStackTrace();
 			}
-			catch (EOFException excepcionEOF) {
-				System.err.println("El servidor terminó la conexión");
-			}
-		} catch (IOException excepcionES) {
-			excepcionES.printStackTrace();
 		}
 	}
 

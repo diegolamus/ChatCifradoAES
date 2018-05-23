@@ -1,7 +1,6 @@
 package interfaz;
 
 import java.awt.Dimension;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -41,7 +40,7 @@ public class VentanaChat extends JFrame {
 		this.setPreferredSize(new Dimension(500, 500));
 
 		// Agregar campo para direccion IP
-		JLabel dirIP = new JLabel("Dirección IP destino:");
+		JLabel dirIP = new JLabel("Direccion IP destino:");
 		dirIP.setBounds(10, 10, 150, 30);
 		this.add(dirIP);
 		direccionIP = new JTextField();
@@ -63,13 +62,13 @@ public class VentanaChat extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 		});
 		this.add(btnConectar);
 		
-		// agregar boton conectar
+		// agregar boton iniciar servidor
 		iniciarServidor = new JButton("Iniciar Servidor");
 		iniciarServidor.setBounds(170, 70, 150, 25);
 		iniciarServidor.addActionListener(new ActionListener() {
@@ -77,8 +76,12 @@ public class VentanaChat extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				btnConectar.setEnabled(false);
+				direccionIP.setEnabled(false);
+				puerto.setText(Servidor.port+"");
+				puerto.setEnabled(false);
 				servidor = new Servidor(getChat());
-				//servidor.ejecutarServidor();
+				Thread hilo = new Thread(servidor);
+				hilo.start();
 			}
 		});
 		this.add(iniciarServidor);
