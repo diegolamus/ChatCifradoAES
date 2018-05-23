@@ -51,8 +51,10 @@ public class Cliente {
 	 * @throws IOException
 	 */
 	public void obtenerFlujos() throws IOException {
+		//lleno la salida
 		salida = new ObjectOutputStream(cliente.getOutputStream());
 		salida.flush();
+		//lleno la entrada
 		entrada = new ObjectInputStream(cliente.getInputStream());
 		
 	}
@@ -72,5 +74,15 @@ public class Cliente {
 	      }
 	}
 	
+	public void enviarDatos (String mensaje) {
+		try {
+	         salida.writeObject( "CLIENTE>>> " + mensaje );
+	         salida.flush();
+	         
+	      }
+	      catch ( IOException excepcionES ) {
+	         
+	      }
+	}
 
 }
