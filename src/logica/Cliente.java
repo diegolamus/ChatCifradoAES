@@ -39,7 +39,11 @@ public class Cliente {
 	      }
 	}
 	
-	
+	/**
+	 * Crea un socket con una ip (la dada por parametro) y el puerto
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 */
 	public void conectarAServidor() throws UnknownHostException, IOException {
 	      cliente = new Socket(InetAddress.getByName( servidorChat ), 12345/*"localhost", 80*/);      
 
@@ -47,7 +51,7 @@ public class Cliente {
 	
 	
 	/**
-	 * obtiene los flujos traidos de la coneccion
+	 * obtiene los flujos traidos de la conexion
 	 * @throws IOException
 	 */
 	public void obtenerFlujos() throws IOException {
@@ -74,6 +78,11 @@ public class Cliente {
 	      }
 	}
 	
+	
+	/**
+	 * 
+	 * @param mensaje
+	 */
 	public void enviarDatos (String mensaje) {
 		try {
 	         salida.writeObject( "CLIENTE>>> " + mensaje );
