@@ -45,6 +45,7 @@ public class Cliente {
 
 	}
 	
+	int a;
 	
 	public void obtenerFlujos() {
 		
