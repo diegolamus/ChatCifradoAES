@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
@@ -38,6 +39,9 @@ public class Servidor implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		KeyPair keys = DiffieHellman.generarKeys();
+		privateKey = keys.getPrivate();
+		publicKey = keys.getPublic();
 	}
 
 	private void esperarConexion() throws IOException {
@@ -54,14 +58,16 @@ public class Servidor implements Runnable {
 	private void procesarConexion() throws IOException {
 		String mensaje = "Conexion exitosa con:" + conexion.getInetAddress().getHostName() + "\n";
 		enviarDatos(mensaje);
-		enviarDatos(PUBLIC_KEY_LABEL + publicKey);
+		enviarDatos(PUBLIC_KEY_LABEL + publicKey);//TODO pasar clave publica en string
 		do {
 			try {
 				mensaje = (String) entrada.readObject();
 				if (mensaje.contains(PUBLIC_KEY_LABEL)) {
-					//TODO
-				} else
-					mostrarMensaje(mensaje + "\n");
+					secret = DiffieHellman.generarClaveSecretaComun(privateKey, mensaje.split(" ")[1]);//TODO pasar striung de clave publica en publicKey
+					System.out.println(secret);
+				} else {
+					mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret));
+				}
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
 			}
@@ -79,10 +85,12 @@ public class Servidor implements Runnable {
 	}
 
 	public void enviarDatos(String mensaje) {
+		String mensajeParaEnviar = "CLIENTE ->  " + mensaje+ "\n";
 		try {
-			salida.writeObject("SERVIDOR -> " + mensaje);
+			String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret);
+			salida.writeObject(mensajeEncriptado);
 			salida.flush();
-			mostrarMensaje("SERVIDOR -> " + mensaje + "\n");
+			mostrarMensaje(mensajeParaEnviar);
 		} catch (Exception e) {
 			mostrarMensaje("Error al enviar mensaje, verifique que el cliente se encuentre conectado.\n");
 		}

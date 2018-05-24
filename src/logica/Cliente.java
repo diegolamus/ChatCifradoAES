@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
@@ -26,6 +27,9 @@ public class Cliente implements Runnable {
 	public Cliente(String direccionIp, VentanaChat chat) {
 		this.chat=chat;
 		IPservidor = direccionIp;
+		KeyPair keys = DiffieHellman.generarKeys();
+		privateKey = keys.getPrivate();
+		publicKey = keys.getPublic();
 	}
 
 	public void conectarAServidor() throws UnknownHostException, IOException {
@@ -44,11 +48,12 @@ public class Cliente implements Runnable {
 		do {
 			try {
 				mensaje = (String) entrada.readObject();
-				mostrarMensaje(mensaje + "\n");
 				if(mensaje.contains(Servidor.PUBLIC_KEY_LABEL)) {
-					enviarDatos(Servidor.PUBLIC_KEY_LABEL+ publicKey.toString());
-					//TODO
-				}
+					enviarDatos(Servidor.PUBLIC_KEY_LABEL+ publicKey.toString());//TODO pasar clave publica en string
+					secret = DiffieHellman.generarClaveSecretaComun(privateKey, mensaje.split(" ")[1]);//TODO pasar striung de clave publica en publicKey
+					System.out.println(secret);
+				}else
+					mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret));
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
 			}
@@ -66,12 +71,16 @@ public class Cliente implements Runnable {
 	}
 
 	public void enviarDatos(String mensaje) {
+		String mensajeParaEnviar = "CLIENTE ->  " + mensaje+ "\n";
 		try {
-			salida.writeObject("CLIENTE ->  " + mensaje);
+			String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret);
+			salida.writeObject(mensajeEncriptado);
 			salida.flush();
-			mostrarMensaje("CLIENTE ->  " + mensaje+ "\n");
+			mostrarMensaje(mensajeParaEnviar);
 		} catch (IOException excepcionES) {
 			excepcionES.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
