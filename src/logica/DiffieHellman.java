@@ -19,7 +19,10 @@ import java.security.spec.X509EncodedKeySpec;
 
 public class DiffieHellman {
 
-
+	/*
+	 * Se generan las llaves a partir de los parametros de una llave publica que se recibe
+	 * Lo usa el cliente oara tomar los parametros de DF que el servidor envia en su clave publica
+	 */
 	public static KeyPair generarKeys(byte[] remotepu) {
 		try {
 			KeyFactory kf = KeyFactory.getInstance("DH");
@@ -38,7 +41,11 @@ public class DiffieHellman {
 		}
 		return null;
 	}
-
+	
+	/*
+	 * Metodo para generar claves publicas y privadas
+	 * Lo usa el servidor, para generar claves con los parametros de DIFFIE HELLMAN
+	 */
 	public static KeyPair generarKeys() {
 		KeyPair keyPair = null;
 		try {
@@ -58,6 +65,9 @@ public class DiffieHellman {
 		return keyPair;
 	}
 	
+	/*
+	 * Se genera el key agreement a partir de la clave privada
+	 */
 	public static KeyAgreement generateKeyAgreement(KeyPair localKp) {
 		try {
 			//CREAR DH AGREEMENT
@@ -70,6 +80,9 @@ public class DiffieHellman {
 		return null;
 	}
 	
+	/*
+	 * Se genera la clave secreta con el key agreement
+	 */
 	public static SecretKey generarClaveSecretaComun(KeyAgreement localka,PrivateKey miLlavePrivada, byte[] laLlavePublica) {
 		SecretKey claveSecreta = null;
 		try {
