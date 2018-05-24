@@ -10,13 +10,11 @@ import java.security.PublicKey;
 public class DiffieHellman {
 
 	public static byte[] generarClaveSecretaComun(PrivateKey miLlavePrivada, PublicKey laLlavePublica) {
-
 		byte[] claveSecreta = null;
 		try {
 			KeyAgreement keyAgreement = KeyAgreement.getInstance("DH");
 			keyAgreement.init(miLlavePrivada);
 			keyAgreement.doPhase(laLlavePublica, true);
-
 			claveSecreta = keyAgreement.generateSecret();
 		} catch (Exception e) {
 			e.printStackTrace();

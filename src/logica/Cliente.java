@@ -45,17 +45,19 @@ public class Cliente implements Runnable {
 
 	public void procesarConexion() throws IOException {	
 		String mensaje="";
+		Object recibido=null;
 		do {
 			try {
-				mensaje = (String) entrada.readObject();
-				if(mensaje.contains(Servidor.PUBLIC_KEY_LABEL)) {
-					enviarDatos(Servidor.PUBLIC_KEY_LABEL+ publicKey.toString());//TODO pasar clave publica en string
-					secret = DiffieHellman.generarClaveSecretaComun(privateKey, mensaje.split(" ")[1]);//TODO pasar striung de clave publica en publicKey
-					System.out.println(secret);
-				}else
-					mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret));
+				recibido = entrada.readObject();
+				mensaje = (String) recibido;
+				//mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret));
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
+			} catch (Exception e) {
+				secret= DiffieHellman.generarClaveSecretaComun(privateKey, (PublicKey)recibido);
+				System.out.println(secret.hashCode());
+				enviarClavePublica(publicKey);
+
 			}
 		} while (!mensaje.equalsIgnoreCase("SERVIDOR -> " + Servidor.TERMINAR));
 	}
@@ -70,6 +72,16 @@ public class Cliente implements Runnable {
 		}
 	}
 
+	public void enviarClavePublica(PublicKey key) {
+		try {
+			mostrarMensaje("Enviado clave pública a servidor\n");
+			salida.writeObject(key);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
 	public void enviarDatos(String mensaje) {
 		String mensajeParaEnviar = "CLIENTE ->  " + mensaje+ "\n";
 		try {

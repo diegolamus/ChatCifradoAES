@@ -10,8 +10,6 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import javax.crypto.SecretKey;
-
 import interfaz.VentanaChat;
 
 public class Servidor implements Runnable {
@@ -58,18 +56,18 @@ public class Servidor implements Runnable {
 	private void procesarConexion() throws IOException {
 		String mensaje = "Conexion exitosa con:" + conexion.getInetAddress().getHostName() + "\n";
 		enviarDatos(mensaje);
-		enviarDatos(PUBLIC_KEY_LABEL + publicKey);//TODO pasar clave publica en string
+		enviarClavePublica(publicKey);
+		Object recibido=null;
 		do {
 			try {
-				mensaje = (String) entrada.readObject();
-				if (mensaje.contains(PUBLIC_KEY_LABEL)) {
-					secret = DiffieHellman.generarClaveSecretaComun(privateKey, mensaje.split(" ")[1]);//TODO pasar striung de clave publica en publicKey
-					System.out.println(secret);
-				} else {
-					mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret));
-				}
+				recibido = entrada.readObject();
+				mensaje = (String) recibido;
+				//mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret));
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
+			} catch(Exception e) {
+				secret= DiffieHellman.generarClaveSecretaComun(privateKey, (PublicKey)recibido);
+				System.out.println(secret);
 			}
 		} while (!mensaje.equalsIgnoreCase("CLIENTE ->" + TERMINAR));
 	}
@@ -84,8 +82,18 @@ public class Servidor implements Runnable {
 		}
 	}
 
+	public void enviarClavePublica(PublicKey key) {
+		try {
+			mostrarMensaje("Enviado clave pública al cliente\n");
+			salida.writeObject(key);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public void enviarDatos(String mensaje) {
-		String mensajeParaEnviar = "CLIENTE ->  " + mensaje+ "\n";
+		String mensajeParaEnviar = "CLIENTE ->  " + mensaje + "\n";
 		try {
 			String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret);
 			salida.writeObject(mensajeEncriptado);
