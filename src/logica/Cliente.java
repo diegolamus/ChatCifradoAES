@@ -10,6 +10,9 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import javax.crypto.KeyAgreement;
+import javax.crypto.SecretKey;
+
 import interfaz.VentanaChat;
 
 public class Cliente implements Runnable {
@@ -22,7 +25,9 @@ public class Cliente implements Runnable {
 	
 	private PrivateKey privateKey;
 	private PublicKey publicKey;
-	private byte[] secret;
+	private SecretKey secret;
+	private KeyAgreement agreement; 
+	
 
 	public Cliente(String direccionIp, VentanaChat chat) {
 		this.chat=chat;
@@ -50,14 +55,18 @@ public class Cliente implements Runnable {
 			try {
 				recibido = entrada.readObject();
 				mensaje = (String) recibido;
+				mostrarMensaje(mensaje);
 				//mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret));
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
 			} catch (Exception e) {
-				secret= DiffieHellman.generarClaveSecretaComun(privateKey, (PublicKey)recibido);
-				System.out.println(secret.hashCode());
+				KeyPair keys = DiffieHellman.generarKeys((byte[])recibido);
+				privateKey = keys.getPrivate();
+				publicKey = keys.getPublic();
+				agreement = DiffieHellman.generateKeyAgreement(keys);
+				secret= DiffieHellman.generarClaveSecretaComun(agreement,privateKey, (byte[]) recibido);
+				mostrarMensaje("HASHCODE CLAVE SECRETA: "+secret.hashCode()+"\n");
 				enviarClavePublica(publicKey);
-
 			}
 		} while (!mensaje.equalsIgnoreCase("SERVIDOR -> " + Servidor.TERMINAR));
 	}
@@ -75,7 +84,7 @@ public class Cliente implements Runnable {
 	public void enviarClavePublica(PublicKey key) {
 		try {
 			mostrarMensaje("Enviado clave pública a servidor\n");
-			salida.writeObject(key);
+			salida.writeObject(key.getEncoded());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -85,8 +94,8 @@ public class Cliente implements Runnable {
 	public void enviarDatos(String mensaje) {
 		String mensajeParaEnviar = "CLIENTE ->  " + mensaje+ "\n";
 		try {
-			String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret);
-			salida.writeObject(mensajeEncriptado);
+			//String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret);
+			salida.writeObject(mensajeParaEnviar);
 			salida.flush();
 			mostrarMensaje(mensajeParaEnviar);
 		} catch (IOException excepcionES) {

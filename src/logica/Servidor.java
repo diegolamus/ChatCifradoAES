@@ -10,11 +10,13 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import javax.crypto.KeyAgreement;
+import javax.crypto.SecretKey;
+
 import interfaz.VentanaChat;
 
 public class Servidor implements Runnable {
 
-	public static final String PUBLIC_KEY_LABEL = "PUBLIC_KEY_SHARE: ";
 	public static final int port = 1234;
 	public static final int backlog = 100;
 	public static final String TERMINAR = "terminar";
@@ -28,7 +30,8 @@ public class Servidor implements Runnable {
 
 	private PrivateKey privateKey;
 	private PublicKey publicKey;
-	private byte[] secret;
+	private SecretKey secret;
+	private KeyAgreement agreement;
 
 	public Servidor(VentanaChat chat) {
 		this.chat = chat;
@@ -40,6 +43,7 @@ public class Servidor implements Runnable {
 		KeyPair keys = DiffieHellman.generarKeys();
 		privateKey = keys.getPrivate();
 		publicKey = keys.getPublic();
+		agreement = DiffieHellman.generateKeyAgreement(keys);
 	}
 
 	private void esperarConexion() throws IOException {
@@ -62,12 +66,13 @@ public class Servidor implements Runnable {
 			try {
 				recibido = entrada.readObject();
 				mensaje = (String) recibido;
-				//mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret));
+				mostrarMensaje(mensaje);
+				//mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret)); TODO
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
 			} catch(Exception e) {
-				secret= DiffieHellman.generarClaveSecretaComun(privateKey, (PublicKey)recibido);
-				System.out.println(secret);
+				secret= DiffieHellman.generarClaveSecretaComun(agreement, privateKey, (byte[])recibido);
+				mostrarMensaje("HASHCODE CLAVE SECRETA: "+secret.hashCode()+"\n");
 			}
 		} while (!mensaje.equalsIgnoreCase("CLIENTE ->" + TERMINAR));
 	}
@@ -85,7 +90,7 @@ public class Servidor implements Runnable {
 	public void enviarClavePublica(PublicKey key) {
 		try {
 			mostrarMensaje("Enviado clave pública al cliente\n");
-			salida.writeObject(key);
+			salida.writeObject(key.getEncoded());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -93,10 +98,11 @@ public class Servidor implements Runnable {
 	}
 
 	public void enviarDatos(String mensaje) {
+		
 		String mensajeParaEnviar = "CLIENTE ->  " + mensaje + "\n";
 		try {
-			String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret);
-			salida.writeObject(mensajeEncriptado);
+			//String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret); TODO
+			salida.writeObject(mensajeParaEnviar);
 			salida.flush();
 			mostrarMensaje(mensajeParaEnviar);
 		} catch (Exception e) {
