@@ -104,7 +104,7 @@ public class Servidor implements Runnable {
 
 	public void enviarDatos(String mensaje) {
 
-		String mensajeParaEnviar = "CLIENTE ->  " + mensaje + "\n";
+		String mensajeParaEnviar = "SERVIDOR ->  " + mensaje + "\n";
 		try {
 			byte[] mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret.getEncoded());
 			salida.writeObject(mensajeEncriptado);
