@@ -55,11 +55,11 @@ public class Cliente implements Runnable {
 			try {
 				recibido = entrada.readObject();
 				mensaje = (String) recibido;
-				mostrarMensaje(mensaje);
-				//mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret));
+				mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret.getEncoded()));
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
-			} catch (Exception e) {
+			} 
+			catch(ClassCastException e) {
 				KeyPair keys = DiffieHellman.generarKeys((byte[])recibido);
 				privateKey = keys.getPrivate();
 				publicKey = keys.getPublic();
@@ -67,7 +67,10 @@ public class Cliente implements Runnable {
 				secret= DiffieHellman.generarClaveSecretaComun(agreement,privateKey, (byte[]) recibido);
 				mostrarMensaje("HASHCODE CLAVE SECRETA: "+secret.hashCode()+"\n");
 				enviarClavePublica(publicKey);
+			}catch(Exception e) {
+				e.printStackTrace();
 			}
+			
 		} while (!mensaje.equalsIgnoreCase("SERVIDOR -> " + Servidor.TERMINAR));
 	}
 
@@ -94,8 +97,8 @@ public class Cliente implements Runnable {
 	public void enviarDatos(String mensaje) {
 		String mensajeParaEnviar = "CLIENTE ->  " + mensaje+ "\n";
 		try {
-			//String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret);
-			salida.writeObject(mensajeParaEnviar);
+			String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret.getEncoded());
+			salida.writeObject(mensajeEncriptado);
 			salida.flush();
 			mostrarMensaje(mensajeParaEnviar);
 		} catch (IOException excepcionES) {

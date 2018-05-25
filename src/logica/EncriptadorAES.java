@@ -5,7 +5,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class EncriptadorAES {
 
-	private static final String ALGORITMODECIFRADO = "AES";
+	private static final String ALGORITMODECIFRADO = "AES/CBC/NOPADDING";
 	
 		/**
 	     * Encripta el texto escrito
@@ -15,7 +15,8 @@ public class EncriptadorAES {
 	     */
 	    public static String encriptar(byte[] textoPlano, byte[] llaveSecreta)  throws Exception
 	    {   	
-	        SecretKeySpec SsecretKey = new SecretKeySpec(llaveSecreta, ALGORITMODECIFRADO);
+	    	
+	        SecretKeySpec SsecretKey = new SecretKeySpec(llaveSecreta,0,8, ALGORITMODECIFRADO);
 	        Cipher cipher = Cipher.getInstance(ALGORITMODECIFRADO);
 	        cipher.init(Cipher.ENCRYPT_MODE, SsecretKey);
 	        return new String(cipher.doFinal(textoPlano));
@@ -29,7 +30,7 @@ public class EncriptadorAES {
 	     */
 	    public static String desencriptar(byte[] mensajeCifrado, byte[] llaveSecreta) throws Exception
 	    {
-	        SecretKeySpec SsecretKey = new SecretKeySpec(llaveSecreta, ALGORITMODECIFRADO);
+	        SecretKeySpec SsecretKey = new SecretKeySpec(llaveSecreta,0,8, ALGORITMODECIFRADO);
 	        Cipher cipher = Cipher.getInstance(ALGORITMODECIFRADO);
 	        cipher.init(Cipher.DECRYPT_MODE, SsecretKey);
 	        return new String(cipher.doFinal(mensajeCifrado));

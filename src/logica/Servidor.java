@@ -59,20 +59,20 @@ public class Servidor implements Runnable {
 
 	private void procesarConexion() throws IOException {
 		String mensaje = "Conexion exitosa con:" + conexion.getInetAddress().getHostName() + "\n";
-		enviarDatos(mensaje);
 		enviarClavePublica(publicKey);
 		Object recibido=null;
 		do {
 			try {
 				recibido = entrada.readObject();
 				mensaje = (String) recibido;
-				mostrarMensaje(mensaje);
-				//mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret)); TODO
+				mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret.getEncoded()));
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
-			} catch(Exception e) {
+			} catch(ClassCastException e) {
 				secret= DiffieHellman.generarClaveSecretaComun(agreement, privateKey, (byte[])recibido);
 				mostrarMensaje("HASHCODE CLAVE SECRETA: "+secret.hashCode()+"\n");
+			}catch(Exception e) {
+				e.printStackTrace();
 			}
 		} while (!mensaje.equalsIgnoreCase("CLIENTE ->" + TERMINAR));
 	}
@@ -101,8 +101,8 @@ public class Servidor implements Runnable {
 		
 		String mensajeParaEnviar = "CLIENTE ->  " + mensaje + "\n";
 		try {
-			//String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret); TODO
-			salida.writeObject(mensajeParaEnviar);
+			String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret.getEncoded());
+			salida.writeObject(mensajeEncriptado);
 			salida.flush();
 			mostrarMensaje(mensajeParaEnviar);
 		} catch (Exception e) {
