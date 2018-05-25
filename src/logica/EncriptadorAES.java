@@ -37,8 +37,7 @@ public class EncriptadorAES {
 		SecretKeySpec SsecretKey = new SecretKeySpec(llaveSecreta, "AES");
 		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 		cipher.init(Cipher.DECRYPT_MODE, SsecretKey,iv);
-		byte[] base64decodedTokenArr = Base64.decodeBase64(mensajeCifrado);
-		return new String(cipher.doFinal(base64decodedTokenArr));
+		return new String(cipher.doFinal(mensajeCifrado));
 	}
 
 	public static byte[] hexToBytes(String str) {
