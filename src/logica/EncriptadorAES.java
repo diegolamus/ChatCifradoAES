@@ -1,12 +1,13 @@
 package logica;
 
+
+
 import java.security.Key;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
 
 public class EncriptadorAES {
 
@@ -19,11 +20,11 @@ public class EncriptadorAES {
 	 *            El texto a encriptar
 	 * @return mensaje encriptado
 	 */
-	public static String encriptar(byte[] textoPlano, byte[] llaveSecreta) throws Exception {
+	public static byte[] encriptar(byte[] textoPlano, byte[] llaveSecreta) throws Exception {
 		Key SsecretKey = new SecretKeySpec(llaveSecreta, "AES");
 		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, SsecretKey,iv);
-		return new String(cipher.doFinal(textoPlano));
+		return cipher.doFinal(textoPlano);
 	}
 
 	/**
@@ -55,5 +56,5 @@ public class EncriptadorAES {
 		}
 
 	}
-
+	
 }
