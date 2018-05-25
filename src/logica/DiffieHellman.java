@@ -4,6 +4,7 @@ import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import java.security.AlgorithmParameterGenerator;
 import java.security.AlgorithmParameters;
@@ -90,7 +91,8 @@ public class DiffieHellman {
 			X509EncodedKeySpec encoder = new X509EncodedKeySpec(laLlavePublica);
 			PublicKey remoteKey =  kf.generatePublic(encoder);
 			localka.doPhase(remoteKey, true);
-			claveSecreta = localka.generateSecret("AES");
+			//claveSecreta = localka.generateSecret("AES");
+			claveSecreta = new SecretKeySpec(localka.generateSecret(), 0,16,"AES");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

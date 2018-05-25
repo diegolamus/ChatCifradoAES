@@ -58,23 +58,28 @@ public class Servidor implements Runnable {
 	}
 
 	private void procesarConexion() throws IOException {
-		String mensaje = "Conexion exitosa con:" + conexion.getInetAddress().getHostName() + "\n";
+		mostrarMensaje("Conexion exitosa con:" + conexion.getInetAddress().getHostName() + "\n");
+		byte[] mensaje = null;
+		String mensajeDec = "";
 		enviarClavePublica(publicKey);
-		Object recibido=null;
+		Object recibido = null;
 		do {
 			try {
 				recibido = entrada.readObject();
-				mensaje = (String) recibido;
-				mostrarMensaje(EncriptadorAES.desencriptar(mensaje.getBytes(), secret.getEncoded()));
+				mensaje = (byte[]) recibido;
+				mensajeDec = EncriptadorAES.desencriptar(mensaje, secret.getEncoded());
+				mostrarMensaje(mensajeDec);
 			} catch (ClassNotFoundException excepcionClaseNoEncontrada) {
 				excepcionClaseNoEncontrada.printStackTrace();
-			} catch(ClassCastException e) {
-				secret= DiffieHellman.generarClaveSecretaComun(agreement, privateKey, (byte[])recibido);
-				mostrarMensaje("HASHCODE CLAVE SECRETA: "+secret.hashCode()+"\n");
-			}catch(Exception e) {
+			} catch (ClassCastException e) {
+				secret = DiffieHellman.generarClaveSecretaComun(agreement, privateKey,
+						((PublicKey) recibido).getEncoded());
+				mostrarMensaje("HASHCODE CLAVE SECRETA: " + secret.hashCode() + "\n");
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} while (!mensaje.equalsIgnoreCase("CLIENTE ->" + TERMINAR));
+		} while (!mensajeDec.equalsIgnoreCase("CLIENTE -> " + Servidor.TERMINAR));
+
 	}
 
 	private void cerrarConexion() {
@@ -90,7 +95,7 @@ public class Servidor implements Runnable {
 	public void enviarClavePublica(PublicKey key) {
 		try {
 			mostrarMensaje("Enviado clave pública al cliente\n");
-			salida.writeObject(key.getEncoded());
+			salida.writeObject(key);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -98,10 +103,10 @@ public class Servidor implements Runnable {
 	}
 
 	public void enviarDatos(String mensaje) {
-		
+
 		String mensajeParaEnviar = "CLIENTE ->  " + mensaje + "\n";
 		try {
-			String mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret.getEncoded());
+			byte[] mensajeEncriptado = EncriptadorAES.encriptar(mensajeParaEnviar.getBytes(), secret.getEncoded());
 			salida.writeObject(mensajeEncriptado);
 			salida.flush();
 			mostrarMensaje(mensajeParaEnviar);
