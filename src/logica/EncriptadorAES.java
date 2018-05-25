@@ -6,6 +6,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.codec.binary.Base64;
+
 public class EncriptadorAES {
 
 	private static final IvParameterSpec iv = new IvParameterSpec(hexToBytes("00000000000000000000000000000000"));
@@ -35,8 +37,8 @@ public class EncriptadorAES {
 		SecretKeySpec SsecretKey = new SecretKeySpec(llaveSecreta, "AES");
 		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 		cipher.init(Cipher.DECRYPT_MODE, SsecretKey,iv);
-		//byte[] base64decodedTokenArr = Base64.decodeBase64(mensajeCifrado);
-		return new String(cipher.doFinal(mensajeCifrado));
+		byte[] base64decodedTokenArr = Base64.decodeBase64(mensajeCifrado);
+		return new String(cipher.doFinal(base64decodedTokenArr));
 	}
 
 	public static byte[] hexToBytes(String str) {
